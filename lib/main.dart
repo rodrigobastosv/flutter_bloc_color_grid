@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_bloc_color_grid/bloc/bloc.dart';
 
 import 'model/tile.dart';
+import 'utils/grid_helper.dart';
 import 'widget/initial_state_widget.dart';
 import 'widget/no_tile_left_widget.dart';
 
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: BlocProvider<GridBloc>(
-        create: (_) => GridBloc(),
+        create: (_) => GridBloc(GridHelper()),
         child: GridPage(),
       ),
     );
