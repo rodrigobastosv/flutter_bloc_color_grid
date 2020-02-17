@@ -2,13 +2,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_bloc_color_grid/bloc/bloc.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart';
 
 import 'model/tile.dart';
 import 'utils/grid_helper.dart';
-import 'widget/initial_state_widget.dart';
 import 'widget/no_tile_left_widget.dart';
 
-void main() => runApp(MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  BlocSupervisor.delegate = await HydratedBlocDelegate.build();
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -57,9 +61,10 @@ class GridPage extends StatelessWidget {
             return _buildGridWithTiles(state.tiles);
           } else if (state is NoTileLeftGridState) {
             return NoTileLeftWidget();
-          } else {
-            return InitialStateWidget();
+          } else if (state is InitialGridState) {
+            return _buildGridWithTiles(state.tiles);
           }
+          return SizedBox.shrink();
         },
       ),
       floatingActionButton: FloatingActionButton(
@@ -93,6 +98,7 @@ class TileWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
+      key: ValueKey(index),
       onTap: () =>
           BlocProvider.of<GridBloc>(context).add(RemoveTileGridEvent(index)),
       child: Container(

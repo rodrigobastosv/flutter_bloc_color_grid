@@ -6,8 +6,12 @@ import 'package:meta/meta.dart';
 abstract class GridState extends Equatable {}
 
 class InitialGridState extends GridState {
+  InitialGridState(this.tiles);
+
+  final List<Tile> tiles;
+
   @override
-  List<Object> get props => [];
+  List<Object> get props => [tiles];
 }
 
 class AddedTileGridState extends GridState {

@@ -1,5 +1,8 @@
 import 'package:bloc_test/bloc_test.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc_color_grid/bloc/bloc.dart';
+import 'package:flutter_bloc_color_grid/model/tile.dart';
+import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
 import '../mock.dart';
@@ -8,8 +11,12 @@ void main() {
   group('GridBloc', () {
     GridBloc gridBloc;
     MockGridHelper mockGridHelper;
+    Tile tile;
+    List<Tile> tiles;
 
     setUp(() {
+      tile = Tile(index: 0, color: Colors.red);
+      tiles.add(tile);
       mockGridHelper = MockGridHelper();
       gridBloc = GridBloc(mockGridHelper);
     });
@@ -24,17 +31,27 @@ void main() {
 
     blocTest(
       'should yield AddedTileGridState after emiting AddTileGridEvent',
-      build: () => gridBloc,
-      act: (bloc) => bloc.add(AddTileGridEvent()),
+      build: () {
+        when(mockGridHelper.generateTile(any)).thenReturn(tile);
+        return gridBloc;
+      },
+      act: (bloc) {
+        bloc.add(AddTileGridEvent());
+        return;
+      },
       expect: [
         InitialGridState(),
-        isA<AddedTileGridState>(),
+        AddedTileGridState(tiles),
       ],
     );
 
     blocTest(
       'should yield RemovedTileGridState after emiting RemoveTileGridEvent',
-      build: () => gridBloc,
+      build: () {
+        when(mockGridHelper.generateTile(any)).thenReturn(tile);
+        tiles.add(tile);
+        return gridBloc;
+      },
       act: (bloc) {
         bloc.add(AddTileGridEvent());
         bloc.add(AddTileGridEvent());
@@ -43,15 +60,18 @@ void main() {
       },
       expect: [
         InitialGridState(),
-        isA<AddedTileGridState>(),
-        isA<AddedTileGridState>(),
-        isA<RemovedTileGridState>(),
+        AddedTileGridState(tiles),
+        AddedTileGridState(tiles),
+        RemovedTileGridState(tiles),
       ],
     );
 
     blocTest(
       'should yield NoTileLeftGridState after emiting RemoveTileGridEvent and no more tiles left',
-      build: () => gridBloc,
+      build: () {
+        when(mockGridHelper.generateTile(any)).thenReturn(tile);
+        return gridBloc;
+      },
       act: (bloc) {
         bloc.add(AddTileGridEvent());
         bloc.add(RemoveTileGridEvent(0));
@@ -59,7 +79,7 @@ void main() {
       },
       expect: [
         InitialGridState(),
-        isA<AddedTileGridState>(),
+        AddedTileGridState(tiles),
         NoTileLeftGridState(),
       ],
     );
